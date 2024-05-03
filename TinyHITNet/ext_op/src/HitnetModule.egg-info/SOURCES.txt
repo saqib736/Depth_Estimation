@@ -1,0 +1,9 @@
+setup.py
+src/HitnetModule/__init__.py
+src/HitnetModule/plane_fitting.py
+src/HitnetModule.egg-info/PKG-INFO
+src/HitnetModule.egg-info/SOURCES.txt
+src/HitnetModule.egg-info/dependency_links.txt
+src/HitnetModule.egg-info/top_level.txt
+src/plane_fitting/plane_fitting.cpp
+src/plane_fitting/plane_fitting_cuda.cu

@@ -1,0 +1,28 @@
+python3 train.py \
+--log_dir logs \
+--exp_name StereoNet \
+--model HITNet_SF \
+--gpus -1 \
+--max_steps 20000 \
+--accelerator gpu \
+--max_disp 100 \
+--max_disp_val 100 \
+--optmizer Adam \
+--lr 4e-4 \
+--lr_decay 1000000 0.25 1300000 0.1 1400000 0.025 \
+--lr_decay_type Lambda \
+--batch_size 8 \
+--batch_size_val 8 \
+--num_workers 16 \
+--num_workers_val 16 \
+--data_augmentation 0 \
+--data_type_train SceneFlow \
+--data_root_train stereo_dataset_256_128 \
+--data_list_train lists/train_new.txt \
+--data_size_train 256 128 \
+--data_type_val SceneFlow \
+--data_root_val stereo_dataset_256_128 \
+--data_list_val lists/test_new.txt \
+--data_size_val 256 128 \
+--robust_loss_a 0.9 \
+--robust_loss_c 0.1
