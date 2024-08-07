@@ -49,7 +49,7 @@ import accelerate
 
 import sys
 sys.path.append("..")
-from dataloader import CustomDataset
+from dataset_prep import CustomDataset
 
 from inference.marigold_pipeline import DepthEstimationPipeline
 from utils.image_util import pyramid_noise_like
@@ -138,14 +138,14 @@ def parse_args():
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
-        default="Bingxin/Marigold",
+        default="prs-eth/marigold-v1-0", #stabilityai/stable-diffusion-2
         required=False,
         help="Path to pretrained model or model identifier from huggingface.co/models.",
     )
     parser.add_argument(
         "--dataset_path",
         type=str,
-        default="monocular_dataset",
+        default="dataset_160x120",
         required=False,
         help="The Root Dataset Path.",
     )
@@ -189,7 +189,7 @@ def parse_args():
     parser.add_argument(
         "--train_batch_size", type=int, default=1, help="Batch size (per device) for the training dataloader."
     )
-    parser.add_argument("--num_train_epochs", type=int, default=5)
+    parser.add_argument("--num_train_epochs", type=int, default=50)
 
     parser.add_argument(
         "--max_train_steps",
@@ -296,7 +296,7 @@ def parse_args():
     parser.add_argument(
         "--checkpointing_steps",
         type=int,
-        default=1000,
+        default=5000,
         help=(
             "Save a checkpoint of the training state every X updates. These checkpoints are only suitable for resuming"
             " training using `--resume_from_checkpoint`."
@@ -331,7 +331,7 @@ def parse_args():
     parser.add_argument(
         "--validation_epochs",
         type=int,
-        default=5,
+        default=1,
         help="Run validation every X epochs.",
     )
     
@@ -364,7 +364,7 @@ def main():
     
     ''' ------------------------Configs Preparation----------------------------'''
     
-    TEST_IMAGE = "custom_dataset_rgb/test/image/02789.png"
+    TEST_IMAGE = "dataset_160x120/test/thermal/01951_saqib.png"
     
     # give the args parsers
     args = parse_args()
@@ -427,12 +427,12 @@ def main():
         text_encoder = CLIPTextModel.from_pretrained(args.pretrained_model_name_or_path,
                                                      subfolder='text_encoder')
         
-        unet = UNet2DConditionModel.from_pretrained(args.pretrained_model_name_or_path,subfolder="unet")
+        # unet = UNet2DConditionModel.from_pretrained(args.pretrained_model_name_or_path,subfolder="unet")
         
-        # unet = UNet2DConditionModel.from_pretrained(args.pretrained_model_name_or_path,subfolder="unet",
-        #                                             in_channels=8, sample_size=96,
-        #                                             low_cpu_mem_usage=False,
-        #                                             ignore_mismatched_sizes=True)
+        unet = UNet2DConditionModel.from_pretrained(args.pretrained_model_name_or_path,subfolder="unet",
+                                                    in_channels=8, sample_size=96,
+                                                    low_cpu_mem_usage=False,
+                                                    ignore_mismatched_sizes=True)
 
     # Freeze vae and text_encoder and set unet to trainable.
     vae.requires_grad_(False)
@@ -536,8 +536,11 @@ def main():
         args.mixed_precision = accelerator.mixed_precision
         
     with accelerator.main_process_first():
-        train_dataset = CustomDataset(args.dataset_path, args.train_list, weight_dtype)
-        test_dataset = CustomDataset(args.dataset_path, args.test_list, weight_dtype)
+        # train_dataset = CustomDataset(args.dataset_path, args.train_list, weight_dtype)
+        # test_dataset = CustomDataset(args.dataset_path, args.test_list, weight_dtype)
+        
+        train_dataset = CustomDataset(args.dataset_path, dtype=weight_dtype, test=False)
+        test_dataset = CustomDataset(args.dataset_path, dtype=weight_dtype, test=True)
         
         train_loader = DataLoader(train_dataset, 
                                   batch_size=args.train_batch_size,

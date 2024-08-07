@@ -106,3 +106,12 @@ def pyramid_noise_like(x, discount=0.9):
     noise += u(torch.randn(b, c, w, h).to(x)) * discount**i
     if w==1 or h==1: break # Lowest resolution is 1x1
   return noise/noise.std() # Scaled back to roughly unit variance
+
+def seed_all(seed: int = 0):
+    """
+    Set random seeds of all components.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)

@@ -1,11 +1,11 @@
 LAUNCH_TRAINING(){
 
 accelerate config default
-pretrained_model_name_or_path='stabilityai/stable-diffusion-2'
-root_path='custom_dataset_rgb'
-output_dir='/outputs/Custom_StableDiffusion'
+pretrained_model_name_or_path='prs-eth/marigold-v1-0'
+root_path='dataset_160x120'
+output_dir='outputs'
 train_batch_size=1
-num_train_epochs=10
+num_train_epochs=100
 gradient_accumulation_steps=8
 learning_rate=1e-5
 lr_warmup_steps=0
@@ -13,7 +13,7 @@ dataloader_num_workers=4
 tracker_project_name='Custom_StableDiffusion'
 
 
-CUDA_VISIBLE_DEVICES=0 accelerate launch --mixed_precision="fp16" depth2image_trainer.py \
+CUDA_VISIBLE_DEVICES=0 accelerate launch --mixed_precision="fp16" train_sd.py \
                   --pretrained_model_name_or_path $pretrained_model_name_or_path \
                   --dataset_path $root_path\
                   --output_dir $output_dir \
